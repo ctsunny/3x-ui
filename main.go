@@ -193,13 +193,6 @@ func showSetting(show bool) {
 		fmt.Println("hasDefaultCredential:", hasDefaultCredential)
 		fmt.Println("port:", port)
 		fmt.Println("webBasePath:", webBasePath)
-
-		loginDisguise, err := settingService.GetLoginDisguise()
-		if err != nil {
-			fmt.Println("get loginDisguise failed, error info:", err)
-		} else {
-			fmt.Println("loginDisguise:", loginDisguise)
-		}
 	}
 }
 
@@ -395,28 +388,6 @@ func GetListenIP(getListen bool) {
 	}
 }
 
-// updateLoginDisguise enables or disables the login page disguise feature based on the value ("true"/"false").
-func updateLoginDisguise(value string) {
-	err := database.InitDB(config.GetDBPath())
-	if err != nil {
-		fmt.Println("Database initialization failed:", err)
-		return
-	}
-
-	settingService := service.SettingService{}
-	enable := value == "true" || value == "1" || value == "yes"
-	err = settingService.SetLoginDisguise(enable)
-	if err != nil {
-		fmt.Printf("Failed to set login disguise: %v\n", err)
-		return
-	}
-	if enable {
-		fmt.Println("Login page disguise enabled.")
-	} else {
-		fmt.Println("Login page disguise disabled.")
-	}
-}
-
 // migrateDb performs database migration operations for the 3x-ui panel.
 func migrateDb() {
 	inboundService := service.InboundService{}
@@ -460,7 +431,6 @@ func main() {
 	var show bool
 	var getCert bool
 	var resetTwoFactor bool
-	var loginDisguise string
 	settingCmd.BoolVar(&reset, "reset", false, "Reset all settings")
 	settingCmd.BoolVar(&show, "show", false, "Display current settings")
 	settingCmd.IntVar(&port, "port", 0, "Set panel port number")
@@ -477,7 +447,6 @@ func main() {
 	settingCmd.StringVar(&tgbotRuntime, "tgbotRuntime", "", "Set cron time for Telegram bot notifications")
 	settingCmd.StringVar(&tgbotchatid, "tgbotchatid", "", "Set chat ID for Telegram bot notifications")
 	settingCmd.BoolVar(&enabletgbot, "enabletgbot", false, "Enable notifications via Telegram bot")
-	settingCmd.StringVar(&loginDisguise, "loginDisguise", "", "Enable/disable login page disguise: true or false")
 
 	oldUsage := flag.Usage
 	flag.Usage = func() {
@@ -530,9 +499,6 @@ func main() {
 		}
 		if enabletgbot {
 			updateTgbotEnableSts(enabletgbot)
-		}
-		if loginDisguise != "" {
-			updateLoginDisguise(loginDisguise)
 		}
 	case "cert":
 		err := settingCmd.Parse(os.Args[2:])

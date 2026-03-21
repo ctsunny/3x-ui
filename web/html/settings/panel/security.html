@@ -40,14 +40,5 @@
             </template>
         </a-setting-list-item>
     </a-collapse-panel>
-    <a-collapse-panel key="3" header='{{ i18n "pages.settings.security.loginDisguise" }}'>
-        <a-setting-list-item paddings="small">
-            <template #title>{{ i18n "pages.settings.security.loginDisguiseEnable" }}</template>
-            <template #description>{{ i18n "pages.settings.security.loginDisguiseEnableDesc" }}</template>
-            <template #control>
-                <a-switch v-model="allSetting.loginDisguise"></a-switch>
-            </template>
-        </a-setting-list-item>
-    </a-collapse-panel>
 </a-collapse>
 {{end}}

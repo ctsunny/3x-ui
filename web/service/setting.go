@@ -102,9 +102,6 @@ var defaultValueMap = map[string]string{
 	"ldapDefaultTotalGB":    "0",
 	"ldapDefaultExpiryDays": "0",
 	"ldapDefaultLimitIP":    "0",
-
-	// Login page disguise
-	"loginDisguise": "false",
 }
 
 // SettingService provides business logic for application settings management.
@@ -817,12 +814,4 @@ func (s *SettingService) GetDefaultSettings(host string) (any, error) {
 	}
 
 	return result, nil
-}
-
-func (s *SettingService) GetLoginDisguise() (bool, error) {
-	return s.getBool("loginDisguise")
-}
-
-func (s *SettingService) SetLoginDisguise(value bool) error {
-	return s.setBool("loginDisguise", value)
 }

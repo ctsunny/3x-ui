@@ -22,6 +22,32 @@
 
 作为原始 X-UI 项目的增强版本，3X-UI 提供了更好的稳定性、更广泛的协议支持和额外的功能。
 
+---
+
+## 🎭 登录页伪装工具
+
+> 将 3x-ui 面板登录页一键伪装为普通 **PHP 网站管理控制台**，降低被自动扫描识别的风险。  
+> **适用于任何已安装 3x-ui 的服务器，无需重新编译，支持一键回退。**
+
+![伪装效果](https://github.com/user-attachments/assets/3103945f-c995-4ec8-a89e-4d68249ef6c4)
+
+```bash
+# 推荐：先下载查看，再执行
+curl -Lo disguise.sh https://raw.githubusercontent.com/ctsunny/3x-ui/main/disguise.sh
+cat disguise.sh   # 查看脚本内容
+bash disguise.sh install
+
+# 一键安装（信任来源时）
+bash <(curl -Ls https://raw.githubusercontent.com/ctsunny/3x-ui/main/disguise.sh) install
+
+# 安装后如遇问题，一键恢复原始页面
+bash disguise.sh restore
+```
+
+📖 **详细教程请见 [DISGUISE.md](./DISGUISE.md)**（安装 · 卸载 · 回退 · 常见问题）
+
+---
+
 ## 快速开始
 
 ```
