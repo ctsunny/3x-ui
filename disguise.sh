@@ -63,6 +63,22 @@ check_xui() {
 is_installed() { [[ -f "$FLAG_FILE" ]] && [[ -f "$BACKUP_BIN" ]]; }
 
 # ── Service management ────────────────────────────────────────────────────────
+# Returns 0 if x-ui service is currently active, non-zero otherwise
+_xui_is_active() {
+    command -v systemctl &>/dev/null && systemctl is-active --quiet x-ui 2>/dev/null
+}
+
+stop_xui() {
+    info "停止 x-ui 服务..."
+    if command -v systemctl &>/dev/null && systemctl list-units --type=service 2>/dev/null | grep -q x-ui; then
+        systemctl stop x-ui && ok "x-ui 已停止" || warn "systemctl 停止失败，请检查服务状态"
+    elif command -v service &>/dev/null; then
+        service x-ui stop && ok "x-ui 已停止" || warn "停止失败，请手动停止: systemctl stop x-ui"
+    else
+        warn "无法自动停止，请手动停止 x-ui 进程后重试"
+    fi
+}
+
 restart_xui() {
     info "重启 x-ui 服务..."
     if command -v systemctl &>/dev/null && systemctl list-units --type=service 2>/dev/null | grep -q x-ui; then
@@ -277,20 +293,26 @@ do_install() {
     cp -f "$XUI_BIN" "$BACKUP_BIN"
     ok "备份完成 ($(du -sh "$BACKUP_BIN" | cut -f1))"
 
-    # 3. Patch the binary
+    # 3. Stop service before patching (avoids "Text file busy" error)
+    local was_running=false
+    _xui_is_active && was_running=true
+    stop_xui
+
+    # 4. Patch the binary
     info "正在修改登录页..."
     if ! _run_patcher patch "$XUI_BIN" "$FAKE_HTML"; then
         fail "补丁应用失败，正在还原..."
         cp -f "$BACKUP_BIN" "$XUI_BIN"
         fail "已还原原始文件。"
+        $was_running && restart_xui
         exit 1
     fi
     ok "登录页已替换为 PHP 风格伪装页面"
 
-    # 4. Mark as installed
+    # 5. Mark as installed
     echo "$TOOL_VER $(date '+%Y-%m-%d %H:%M:%S')" > "$FLAG_FILE"
 
-    # 5. Restart service
+    # 6. Restart service
     restart_xui
 
     sep
@@ -313,6 +335,7 @@ do_remove() {
     fi
 
     info "从备份还原原始二进制文件..."
+    stop_xui
     cp -f "$BACKUP_BIN" "$XUI_BIN"
     ok "原始文件已还原"
 
@@ -343,6 +366,7 @@ do_restore() {
     read -r confirm
     [[ "$confirm" =~ ^[Yy]$ ]] || { info "已取消。"; exit 0; }
 
+    stop_xui
     cp -f "$BACKUP_BIN" "$XUI_BIN"
     ok "原始文件已强制还原"
 
