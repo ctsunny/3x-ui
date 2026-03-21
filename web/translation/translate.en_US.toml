@@ -605,6 +605,9 @@
 "twoFactorModalSetSuccess" = "Two-factor authentication has been successfully established"
 "twoFactorModalDeleteSuccess" = "Two-factor authentication has been successfully deleted"
 "twoFactorModalError" = "Wrong code"
+"loginDisguise" = "Login page disguise"
+"loginDisguiseEnable" = "Enable login page disguise"
+"loginDisguiseEnableDesc" = "Replaces the login page with a generic PHP-styled web page to hide the panel identity from casual observers."
 
 [pages.settings.toasts]
 "modifySettings" = "The parameters have been changed."

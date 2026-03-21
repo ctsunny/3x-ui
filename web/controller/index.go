@@ -52,7 +52,11 @@ func (a *IndexController) index(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, "panel/")
 		return
 	}
-	html(c, "login.html", "pages.login.title", nil)
+	loginTemplate := "login.html"
+	if disguise, err := a.settingService.GetLoginDisguise(); err == nil && disguise {
+		loginTemplate = "login_disguise.html"
+	}
+	html(c, loginTemplate, "pages.login.title", nil)
 }
 
 // login handles user authentication and session creation.

@@ -279,6 +279,27 @@ reset_config() {
     restart
 }
 
+toggle_login_disguise() {
+    local current
+    current=$(${xui_folder}/x-ui setting -show true 2>/dev/null | grep 'loginDisguise' | awk '{print $2}')
+    if [[ "${current}" == "true" ]]; then
+        confirm "Login page disguise is currently ENABLED. Disable it?" "y"
+        if [[ $? == 0 ]]; then
+            ${xui_folder}/x-ui setting -loginDisguise false
+            echo -e "${green}Login page disguise has been disabled. The panel login page is restored.${plain}"
+            restart
+        fi
+    else
+        confirm "Login page disguise is currently DISABLED. Enable it? (The login page will appear as a generic PHP web page)" "y"
+        if [[ $? == 0 ]]; then
+            ${xui_folder}/x-ui setting -loginDisguise true
+            echo -e "${green}Login page disguise has been enabled. The login page now appears as a generic PHP web page.${plain}"
+            restart
+        fi
+    fi
+    before_show_menu
+}
+
 check_config() {
     local info=$(${xui_folder}/x-ui setting -show true)
     if [[ $? != 0 ]]; then
@@ -2216,10 +2237,12 @@ show_menu() {
 │  ${green}24.${plain} Enable BBR                                │
 │  ${green}25.${plain} Update Geo Files                          │
 │  ${green}26.${plain} Speedtest by Ookla                        │
+│────────────────────────────────────────────────│
+│  ${green}27.${plain} Toggle Login Page Disguise                │
 ╚────────────────────────────────────────────────╝
 "
     show_status
-    echo && read -rp "Please enter your selection [0-26]: " num
+    echo && read -rp "Please enter your selection [0-27]: " num
 
     case "${num}" in
     0)
@@ -2303,8 +2326,11 @@ show_menu() {
     26)
         run_speedtest
         ;;
+    27)
+        check_install && toggle_login_disguise
+        ;;
     *)
-        LOGE "Please enter the correct number [0-26]"
+        LOGE "Please enter the correct number [0-27]"
         ;;
     esac
 }
