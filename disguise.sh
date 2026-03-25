@@ -171,7 +171,7 @@ _run_patcher() {
     local tmp_html
     tmp_html=$(mktemp /tmp/xui_disguise_fake.XXXXXX.html)
     printf '%s' "$fake_html" > "$tmp_html"
-    trap 'rm -f "$tmp_html"' RETURN
+    trap 'rm -f "${tmp_html:-}"' RETURN
 
     python3 - "$action" "$bin_path" "$tmp_html" << 'PYEOF'
 import sys, os
@@ -280,7 +280,7 @@ do_install() {
 
     # 1. Verify the patcher can locate the login template before touching anything
     info "检测 3x-ui 二进制文件中的登录页模板..."
-    if ! _run_patcher verify "$XUI_BIN" "$FAKE_HTML" 2>&1; then
+    if ! _run_patcher verify "$XUI_BIN" "$FAKE_HTML" >/dev/null 2>&1; then
         fail "模板定位失败，无法继续。"
         fail "请确认 3x-ui 版本为 mhsanaei/3x-ui v2.x，且未使用 UPX 压缩。"
         exit 1
@@ -300,7 +300,7 @@ do_install() {
 
     # 4. Patch the binary
     info "正在修改登录页..."
-    if ! _run_patcher patch "$XUI_BIN" "$FAKE_HTML"; then
+    if ! _run_patcher patch "$XUI_BIN" "$FAKE_HTML" >/dev/null; then
         fail "补丁应用失败，正在还原..."
         cp -f "$BACKUP_BIN" "$XUI_BIN"
         fail "已还原原始文件。"
