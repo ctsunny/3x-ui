@@ -29,7 +29,7 @@ BACKUP_DIR="/etc/x-ui-disguise"
 BACKUP_BIN="$BACKUP_DIR/x-ui.bak"
 FLAG_FILE="$BACKUP_DIR/.disguise_active"
 LOG_FILE="$BACKUP_DIR/disguise.log"
-TOOL_VER="1.1.0"
+TOOL_VER="1.1.1"
 
 # ── Logging & output helpers ──────────────────────────────────────────────────
 _log() { mkdir -p "$BACKUP_DIR" 2>/dev/null; echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >>"$LOG_FILE" 2>/dev/null || true; }
@@ -91,73 +91,237 @@ restart_xui() {
 }
 
 # ── Compact fake PHP-style login page HTML ────────────────────────────────────
-# 注意: window.location.pathname 在运行时自动检测 base_path, 无需硬编码
-# Note: base_path is auto-detected at runtime via window.location.pathname
-FAKE_HTML='<!DOCTYPE html><html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+# 注意: 保留 3x-ui 的 page 模板骨架，仅替换登录页主体，避免页面把样式/脚本当正文显示
+# Note: Keep the shared page-template shell and replace only the login content
+FAKE_HTML='{{ template "page/head_start" .}}
 <meta name="generator" content="PHP/8.1.2">
-<meta name="robots" content="noindex,nofollow">
 <title>Web Management Console</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font:13px Arial,sans-serif;background:#d0d0d0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;color:#333}
-#box{background:#fff;border:1px solid #aaa;border-radius:3px;width:100%;max-width:380px;box-shadow:2px 2px 5px rgba(0,0,0,.2)}
-.hd{background:#f0f0f0;border-bottom:1px solid #ccc;padding:10px 16px;display:flex;align-items:center;gap:8px}
-.hd svg{flex-shrink:0}.hd h1{font-size:14px;font-weight:bold;color:#444;margin:0}
-.bd{padding:20px}.dc{margin-bottom:14px;color:#666;font-size:11px;line-height:1.5}
-#msg{margin-bottom:10px;padding:7px 10px;border-radius:2px;font-size:12px;display:none}
-#msg.e{background:#fde;border:1px solid #f5c;color:#a00}
-.rw{margin-bottom:12px}
-.rw label{display:block;font-size:11px;color:#555;margin-bottom:3px;font-weight:bold}
-.rw input{width:100%;padding:6px 8px;border:1px solid #bbb;border-radius:2px;font-size:13px;outline:none}
-.rw input:focus{border-color:#6a9;box-shadow:0 0 3px rgba(80,160,80,.25)}
-.ac{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px}
-.btn{padding:6px 18px;background:#5a8;border:1px solid #4a7;color:#fff;font-size:13px;border-radius:2px;cursor:pointer}
-.btn:hover{background:#4a7}.btn:disabled{background:#9ab;border-color:#8aa;cursor:not-allowed}
-#sp{display:none;font-size:11px;color:#888}
-footer{margin-top:10px;font-size:10px;color:#888;text-align:center}
+  #message { display: none !important; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #d7d7d7;
+    color: #2f2f2f;
+    font: 13px Arial, Helvetica, sans-serif;
+  }
+  .php-console {
+    width: 100%;
+    max-width: 400px;
+  }
+  .php-card {
+    border: 1px solid #a9a9a9;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+  }
+  .php-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #c9c9c9;
+    background: linear-gradient(#f6f6f6, #e8e8e8);
+  }
+  .php-head h1 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #404040;
+  }
+  .php-body {
+    padding: 18px 18px 16px;
+  }
+  .php-note {
+    margin: 0 0 14px;
+    color: #5d5d5d;
+    line-height: 1.5;
+    font-size: 11px;
+  }
+  .php-alert {
+    display: none;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border: 1px solid #e2b4b4;
+    background: #fff1f1;
+    color: #a33d3d;
+    font-size: 12px;
+  }
+  .php-row {
+    margin-bottom: 12px;
+  }
+  .php-row label {
+    display: block;
+    margin-bottom: 4px;
+    color: #545454;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .php-row input {
+    width: 100%;
+    height: 34px;
+    padding: 6px 9px;
+    border: 1px solid #b7b7b7;
+    background: #ffffff;
+    color: #303030;
+    font: inherit;
+    outline: none;
+  }
+  .php-row input:focus {
+    border-color: #729a6b;
+    box-shadow: 0 0 0 2px rgba(114, 154, 107, 0.14);
+  }
+  .php-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .php-status {
+    display: none;
+    color: #6b6b6b;
+    font-size: 11px;
+  }
+  .php-btn {
+    min-width: 96px;
+    height: 33px;
+    border: 1px solid #4d8151;
+    background: linear-gradient(#69a56e, #4e8554);
+    color: #ffffff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .php-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  .php-foot {
+    margin-top: 10px;
+    text-align: center;
+    color: #7a7a7a;
+    font-size: 10px;
+  }
 </style>
-</head>
-<body>
-<div id="box">
-<div class="hd">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="3" fill="#5a8"/><path d="M6 8h12M6 12h12M6 16h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-<h1>Web Management Console</h1>
+{{ template "page/head_end" .}}
+
+{{ template "page/body_start" .}}
+<div class="php-console">
+  <div class="php-card">
+    <div class="php-head">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect width="24" height="24" rx="3" fill="#5e975f"></rect>
+        <path d="M6 8h12M6 12h12M6 16h8" stroke="#ffffff" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <h1>Web Management Console</h1>
+    </div>
+    <div class="php-body">
+      <p class="php-note">Enter your administrator credentials to access the management console.</p>
+      <div id="msg" class="php-alert"></div>
+      <form id="f">
+        <div class="php-row">
+          <label for="u">Username</label>
+          <input type="text" id="u" autocomplete="username" autofocus required placeholder="admin">
+        </div>
+        <div class="php-row">
+          <label for="pw">Password</label>
+          <input type="password" id="pw" autocomplete="current-password" required placeholder="Password">
+        </div>
+        <div class="php-row" id="tfa" style="display:none">
+          <label for="vc">Verification Code</label>
+          <input type="text" id="vc" autocomplete="one-time-code" maxlength="8" inputmode="numeric" placeholder="6-digit code">
+        </div>
+        <div class="php-actions">
+          <span id="sp" class="php-status">Authenticating&hellip;</span>
+          <button type="submit" id="sb" class="php-btn">Log In</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="php-foot">Powered by PHP/8.1.2 &bull; Web Management System</div>
 </div>
-<div class="bd">
-<p class="dc">Enter your administrator credentials to access the management console.</p>
-<div id="msg"></div>
-<form id="f" onsubmit="go(event)">
-<div class="rw"><label>Username</label><input type="text" id="u" autocomplete="username" autofocus required placeholder="admin"></div>
-<div class="rw"><label>Password</label><input type="password" id="pw" autocomplete="current-password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
-<div class="rw" id="tfa" style="display:none"><label>Verification Code</label><input type="text" id="vc" autocomplete="one-time-code" placeholder="6-digit code" maxlength="8" inputmode="numeric"></div>
-<div class="ac"><span id="sp">Authenticating&hellip;</span><button type="submit" class="btn" id="sb">Log In</button></div>
-</form>
-</div>
-</div>
-<footer>Powered by PHP/8.1.2 &bull; Web Management System</footer>
 <script>
-var B=(function(){var p=window.location.pathname;return p.endsWith("/")?p:p.substring(0,p.lastIndexOf("/")+1);}());
-(function(){var x=new XMLHttpRequest();x.open("POST",B+"getTwoFactorEnable",true);x.setRequestHeader("Content-Type","application/json");x.setRequestHeader("X-Requested-With","XMLHttpRequest");x.onload=function(){try{var r=JSON.parse(x.responseText);if(r.success&&r.obj===true)document.getElementById("tfa").style.display="";}catch(e){}};x.send("{}");}());
-function go(e){e.preventDefault();
-var u=document.getElementById("u").value.trim(),pw=document.getElementById("pw").value.trim(),vc=(document.getElementById("vc")||{value:""}).value.trim(),m=document.getElementById("msg");
-m.style.display="none";
-if(!u||!pw){m.className="e";m.textContent="Username and password are required.";m.style.display="block";return;}
-document.getElementById("sb").disabled=true;document.getElementById("sp").style.display="inline";
-var x=new XMLHttpRequest();x.open("POST",B+"login",true);x.setRequestHeader("Content-Type","application/json");x.setRequestHeader("X-Requested-With","XMLHttpRequest");
-x.onload=function(){document.getElementById("sb").disabled=false;document.getElementById("sp").style.display="none";
-try{var r=JSON.parse(x.responseText);if(r.success){window.location.href=B+"panel/";}else{m.className="e";m.textContent=r.msg||"Invalid credentials.";m.style.display="block";}}
-catch(ex){m.className="e";m.textContent="An error occurred. Please try again.";m.style.display="block";}};
-x.onerror=function(){document.getElementById("sb").disabled=false;document.getElementById("sp").style.display="none";m.className="e";m.textContent="Network error. Please check your connection.";m.style.display="block";};
-x.send(JSON.stringify({username:u,password:pw,twoFactorCode:vc}));}
+  var B = "{{ .base_path }}";
+  if (!B) B = "/";
+  if (B.slice(-1) !== "/") B += "/";
+
+  var form = document.getElementById("f");
+  var msg = document.getElementById("msg");
+  var submitButton = document.getElementById("sb");
+  var spinner = document.getElementById("sp");
+  var twoFactorBox = document.getElementById("tfa");
+
+  function showError(text) {
+    msg.textContent = text;
+    msg.style.display = "block";
+  }
+
+  function setBusy(busy) {
+    submitButton.disabled = busy;
+    spinner.style.display = busy ? "inline" : "none";
+  }
+
+  function request(path, payload, onSuccess, fallbackText) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", B + path, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    xhr.onload = function () {
+      try {
+        onSuccess(JSON.parse(xhr.responseText || "{}"));
+      } catch (e) {
+        showError(fallbackText);
+      }
+    };
+    xhr.onerror = function () {
+      showError("Network error. Please check your connection.");
+    };
+    xhr.send(JSON.stringify(payload || {}));
+  }
+
+  request("getTwoFactorEnable", {}, function (resp) {
+    if (resp && resp.success && resp.obj === true) {
+      twoFactorBox.style.display = "";
+    }
+  }, "");
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    msg.style.display = "none";
+
+    var username = document.getElementById("u").value.trim();
+    var password = document.getElementById("pw").value.trim();
+    var code = document.getElementById("vc").value.trim();
+
+    if (!username || !password) {
+      showError("Username and password are required.");
+      return;
+    }
+
+    setBusy(true);
+    request("login", {
+      username: username,
+      password: password,
+      twoFactorCode: code
+    }, function (resp) {
+      setBusy(false);
+      if (resp && resp.success) {
+        window.location.href = B + "panel/";
+        return;
+      }
+      showError(resp && resp.msg ? resp.msg : "Invalid credentials.");
+    }, "An error occurred. Please try again.");
+  });
 </script>
-</body></html>'
+{{ template "page/body_end" .}}'
 
 # ── Python binary patcher (run inline) ───────────────────────────────────────
 # Strategy: search for unique Go template anchors that exist in login.html,
 #           locate the surrounding template region, replace in-place (same size,
-#           padded with spaces – harmless trailing whitespace after </html>).
+#           padded with spaces – harmless trailing whitespace after the template).
 #
 # This modifies the 3x-ui binary on disk; no source code compilation required.
 # Backup is kept; 'restore' reverses the patch byte-for-byte.
@@ -200,6 +364,8 @@ ANCHORS = [
     b'class="login-app"',            # Root element class
 ]
 TSTART = b'{{ template "page/head_start" .}}'
+TMIDDLE1 = b'{{ template "page/head_end" .}}'
+TMIDDLE2 = b'{{ template "page/body_start" .}}'
 TEND   = b'{{ template "page/body_end" .}}'
 
 # Search window: login.html is typically ~10 KB, so 48 KB gives ample room
@@ -234,6 +400,12 @@ if end < len(data) and data[end] in (10, 13):
     end += 1
 
 region_len = end - start
+
+required_markers = [TSTART, TMIDDLE1, TMIDDLE2, TEND]
+for marker in required_markers:
+    if marker not in data[start:end]:
+        print("ERROR: Located template region does not match expected login layout.", file=sys.stderr)
+        sys.exit(1)
 
 if action == "verify":
     print(f"OK: login template found at offset {start}, size {region_len} bytes")
