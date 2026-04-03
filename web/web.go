@@ -97,6 +97,7 @@ type Server struct {
 	listener   net.Listener
 
 	index *controller.IndexController
+	login *controller.LoginController
 	panel *controller.XUIController
 	api   *controller.APIController
 	ws    *controller.WebSocketController
@@ -267,6 +268,7 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 	g := engine.Group(basePath)
 
 	s.index = controller.NewIndexController(g)
+	s.login = controller.NewLoginController(g)
 	s.panel = controller.NewXUIController(g)
 	s.api = controller.NewAPIController(g)
 
