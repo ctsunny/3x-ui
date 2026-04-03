@@ -1,3 +1,4 @@
+{{ define "login/login.html" }}
 {{ template "page/head_start" .}}
 {{ template "page/head_end" .}}
 
@@ -104,3 +105,4 @@
 {{template "component/aThemeSwitch" .}}
 <script src="{{ .base_path }}assets/js/login/index.js?{{ .cur_ver }}"></script>
 {{ template "page/body_end" .}}
+{{ end }}
