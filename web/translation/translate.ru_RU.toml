@@ -605,6 +605,9 @@
 "twoFactorModalSetSuccess" = "Двухфакторная аутентификация была успешно установлена"
 "twoFactorModalDeleteSuccess" = "Двухфакторная аутентификация была успешно удалена"
 "twoFactorModalError" = "Неверный код"
+"disguise" = "Login Disguise"
+"disguiseEnable" = "Enable Login Disguise"
+"disguiseEnableDesc" = "Replace the login page with a generic PHP-style management console to hide the panel identity. Restart the panel for changes to take effect."
 
 [pages.settings.toasts]
 "modifySettings" = "Настройки изменены"

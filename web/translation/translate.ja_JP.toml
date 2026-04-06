@@ -605,6 +605,9 @@
 "twoFactorModalSetSuccess" = "二要素認証が正常に設定されました"
 "twoFactorModalDeleteSuccess" = "二要素認証が正常に削除されました"
 "twoFactorModalError" = "コードが間違っています"
+"disguise" = "Login Disguise"
+"disguiseEnable" = "Enable Login Disguise"
+"disguiseEnableDesc" = "Replace the login page with a generic PHP-style management console to hide the panel identity. Restart the panel for changes to take effect."
 
 [pages.settings.toasts]
 "modifySettings" = "パラメーターが変更されました。"

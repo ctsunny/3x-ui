@@ -605,6 +605,9 @@
 "twoFactorModalSetSuccess" = "تم إنشاء المصادقة الثنائية بنجاح"
 "twoFactorModalDeleteSuccess" = "تم حذف المصادقة الثنائية بنجاح"
 "twoFactorModalError" = "رمز خاطئ"
+"disguise" = "Login Disguise"
+"disguiseEnable" = "Enable Login Disguise"
+"disguiseEnableDesc" = "Replace the login page with a generic PHP-style management console to hide the panel identity. Restart the panel for changes to take effect."
 
 [pages.settings.toasts]
 "modifySettings" = "تم تغيير المعلمات."

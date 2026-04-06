@@ -605,6 +605,9 @@
 "twoFactorModalSetSuccess" = "Autentikasi dua faktor telah berhasil dibuat"
 "twoFactorModalDeleteSuccess" = "Autentikasi dua faktor telah berhasil dihapus"
 "twoFactorModalError" = "Kode salah"
+"disguise" = "Login Disguise"
+"disguiseEnable" = "Enable Login Disguise"
+"disguiseEnableDesc" = "Replace the login page with a generic PHP-style management console to hide the panel identity. Restart the panel for changes to take effect."
 
 [pages.settings.toasts]
 "modifySettings" = "Parameter telah diubah."

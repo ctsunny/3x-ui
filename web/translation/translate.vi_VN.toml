@@ -605,6 +605,9 @@
 "twoFactorModalSetSuccess" = "Xác thực hai yếu tố đã được thiết lập thành công"
 "twoFactorModalDeleteSuccess" = "Xác thực hai yếu tố đã được xóa thành công"
 "twoFactorModalError" = "Mã sai"
+"disguise" = "Login Disguise"
+"disguiseEnable" = "Enable Login Disguise"
+"disguiseEnableDesc" = "Replace the login page with a generic PHP-style management console to hide the panel identity. Restart the panel for changes to take effect."
 
 [pages.settings.toasts]
 "modifySettings" = "Các tham số đã được thay đổi."

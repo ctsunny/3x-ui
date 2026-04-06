@@ -605,6 +605,9 @@
 "twoFactorModalSetSuccess" = "双因素认证已成功建立"
 "twoFactorModalDeleteSuccess" = "双因素认证已成功删除"
 "twoFactorModalError" = "验证码错误"
+"disguise" = "登录页伪装"
+"disguiseEnable" = "启用登录页伪装"
+"disguiseEnableDesc" = "将登录页替换为普通 PHP 风格的网站管理控制台页面，隐藏面板真实身份。修改后需重启面板生效。"
 
 [pages.settings.toasts]
 "modifySettings" = "参数已更改。"

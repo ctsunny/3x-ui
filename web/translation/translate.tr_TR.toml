@@ -605,6 +605,9 @@
 "twoFactorModalSetSuccess" = "İki faktörlü kimlik doğrulama başarıyla kuruldu"
 "twoFactorModalDeleteSuccess" = "İki faktörlü kimlik doğrulama başarıyla silindi"
 "twoFactorModalError" = "Yanlış kod"
+"disguise" = "Login Disguise"
+"disguiseEnable" = "Enable Login Disguise"
+"disguiseEnableDesc" = "Replace the login page with a generic PHP-style management console to hide the panel identity. Restart the panel for changes to take effect."
 
 [pages.settings.toasts]
 "modifySettings" = "Parametreler değiştirildi."
