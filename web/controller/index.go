@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/mhsanaei/3x-ui/v2/logger"
 	"github.com/mhsanaei/3x-ui/v2/web/service"
 	"github.com/mhsanaei/3x-ui/v2/web/session"
 
@@ -33,7 +34,10 @@ func (a *IndexController) index(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, "panel/")
 		return
 	}
-	disguise, _ := a.settingService.GetDisguiseLoginPage()
+	disguise, err := a.settingService.GetDisguiseLoginPage()
+	if err != nil {
+		logger.Warning("Failed to get disguise login page setting:", err)
+	}
 	if disguise {
 		html(c, "login/login_disguise.html", "Web Management Console", nil)
 		return

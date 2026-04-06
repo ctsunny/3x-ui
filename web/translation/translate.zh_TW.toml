@@ -605,9 +605,9 @@
 "twoFactorModalSetSuccess" = "雙重身份驗證已成功建立"
 "twoFactorModalDeleteSuccess" = "雙重身份驗證已成功刪除"
 "twoFactorModalError" = "驗證碼錯誤"
-"disguise" = "Login Disguise"
-"disguiseEnable" = "Enable Login Disguise"
-"disguiseEnableDesc" = "Replace the login page with a generic PHP-style management console to hide the panel identity. Restart the panel for changes to take effect."
+"disguise" = "登入頁偽裝"
+"disguiseEnable" = "啟用登入頁偽裝"
+"disguiseEnableDesc" = "將登入頁替換為普通 PHP 風格的網站管理控制台頁面，隱藏面板真實身份。修改後需重啟面板生效。"
 
 [pages.settings.toasts]
 "modifySettings" = "參數已更改。"
