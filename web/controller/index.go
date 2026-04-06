@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/mhsanaei/3x-ui/v2/web/service"
 	"github.com/mhsanaei/3x-ui/v2/web/session"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,7 @@ import (
 // IndexController handles the main index route.
 type IndexController struct {
 	BaseController
+	settingService service.SettingService
 }
 
 // NewIndexController creates a new IndexController and initializes its routes.
@@ -29,6 +31,11 @@ func (a *IndexController) initRouter(g *gin.RouterGroup) {
 func (a *IndexController) index(c *gin.Context) {
 	if session.IsLogin(c) {
 		c.Redirect(http.StatusTemporaryRedirect, "panel/")
+		return
+	}
+	disguise, _ := a.settingService.GetDisguiseLoginPage()
+	if disguise {
+		html(c, "login/login_disguise.html", "Web Management Console", nil)
 		return
 	}
 	html(c, "login/login.html", "pages.login.title", nil)

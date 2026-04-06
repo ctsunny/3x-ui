@@ -51,6 +51,7 @@ var defaultValueMap = map[string]string{
 	"tgLang":                      "en-US",
 	"twoFactorEnable":             "false",
 	"twoFactorToken":              "",
+	"disguiseLoginPage":           "false",
 	"subEnable":                   "true",
 	"subJsonEnable":               "false",
 	"subTitle":                    "",
@@ -372,6 +373,14 @@ func (s *SettingService) GetTwoFactorToken() (string, error) {
 
 func (s *SettingService) SetTwoFactorToken(value string) error {
 	return s.setString("twoFactorToken", value)
+}
+
+func (s *SettingService) GetDisguiseLoginPage() (bool, error) {
+	return s.getBool("disguiseLoginPage")
+}
+
+func (s *SettingService) SetDisguiseLoginPage(value bool) error {
+	return s.setBool("disguiseLoginPage", value)
 }
 
 func (s *SettingService) GetPort() (int, error) {
