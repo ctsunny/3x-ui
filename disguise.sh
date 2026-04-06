@@ -30,14 +30,15 @@ BACKUP_BIN="$BACKUP_DIR/x-ui.bak"
 FLAG_FILE="$BACKUP_DIR/.disguise_active"
 LOG_FILE="$BACKUP_DIR/disguise.log"
 TOOL_VER="1.1.1"
+VERBOSE=0
 
 # ── Logging & output helpers ──────────────────────────────────────────────────
 _log() { mkdir -p "$BACKUP_DIR" 2>/dev/null; echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >>"$LOG_FILE" 2>/dev/null || true; }
 ok()   { echo -e "${G}[✓]${P} $*";  _log "OK: $*"; }
 warn() { echo -e "${Y}[!]${P} $*";  _log "WARN: $*"; }
 fail() { echo -e "${R}[✗]${P} $*" >&2; _log "ERR: $*"; }
-info() { echo -e "${C}[i]${P} $*"; }
-sep()  { echo -e "${B}────────────────────────────────────────────────${P}"; }
+info() { [[ $VERBOSE -eq 1 ]] && echo -e "${C}[i]${P} $*"; _log "INFO: $*"; }
+sep()  { [[ $VERBOSE -eq 1 ]] && echo -e "${B}────────────────────────────────────────────────${P}"; return 0; }
 
 # ── Prerequisite checks ───────────────────────────────────────────────────────
 check_root() {
@@ -442,7 +443,7 @@ do_install() {
     check_deps
     check_xui
     sep
-    echo -e "${C} 3x-ui 登录页伪装工具 v${TOOL_VER}${P}"
+    info "3x-ui 登录页伪装工具 v${TOOL_VER}"
     sep
 
     if is_installed; then
@@ -497,7 +498,7 @@ do_install() {
 do_remove() {
     check_root
     sep
-    echo -e "${C} 3x-ui 登录页伪装工具 v${TOOL_VER} — 卸载${P}"
+    info "3x-ui 登录页伪装工具 v${TOOL_VER} — 卸载"
     sep
 
     if ! is_installed; then
@@ -524,7 +525,7 @@ do_remove() {
 do_restore() {
     check_root
     sep
-    echo -e "${C} 3x-ui 登录页伪装工具 v${TOOL_VER} — 强制恢复${P}"
+    info "3x-ui 登录页伪装工具 v${TOOL_VER} — 强制恢复"
     sep
 
     if [[ ! -f "$BACKUP_BIN" ]]; then
@@ -553,6 +554,7 @@ do_restore() {
 }
 
 do_status() {
+    VERBOSE=1
     sep
     echo -e "${C} 3x-ui 登录页伪装工具 v${TOOL_VER} — 状态${P}"
     sep
@@ -608,6 +610,7 @@ do_status() {
 
 # ── Interactive menu ──────────────────────────────────────────────────────────
 show_menu() {
+    VERBOSE=1
     clear 2>/dev/null || true
     sep
     echo -e "${C}  3x-ui 登录页伪装工具  v${TOOL_VER}${P}"
@@ -641,7 +644,16 @@ show_menu() {
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 main() {
-    case "${1:-menu}" in
+    # Parse flags
+    local args=()
+    for arg in "$@"; do
+        case "$arg" in
+            --verbose) VERBOSE=1 ;;
+            *) args+=("$arg") ;;
+        esac
+    done
+
+    case "${args[0]:-menu}" in
         install)  do_install  ;;
         remove)   do_remove   ;;
         restore)  do_restore  ;;
@@ -649,11 +661,12 @@ main() {
         menu|"")  show_menu   ;;
         -v|--version) echo "disguise.sh v$TOOL_VER"; exit 0 ;;
         *)
-            echo -e "用法 / Usage: bash disguise.sh [install|remove|restore|status]"
-            echo -e "  install  安装伪装"
-            echo -e "  remove   卸载伪装"
-            echo -e "  restore  强制恢复（紧急）"
-            echo -e "  status   查看状态"
+            echo -e "用法 / Usage: bash disguise.sh [install|remove|restore|status] [--verbose]"
+            echo -e "  install    安装伪装"
+            echo -e "  remove     卸载伪装"
+            echo -e "  restore    强制恢复（紧急）"
+            echo -e "  status     查看状态"
+            echo -e "  --verbose  显示详细信息"
             exit 1
             ;;
     esac
